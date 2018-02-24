@@ -4,12 +4,32 @@ import org.python.compiler.Module;
 import org.python.util.PythonInterpreter;
 import org.python.core.*;
 import java.sql.*;
+import java.util.Scanner;
+
 
 public class Main
 {
     public static void main(String[] args)
 	{
-		Connection con = null;
+		Scanner cin = new Scanner(System.in);
+		String in;
+		Parser parser = new Parser();
+		boolean quit = false;
+		while(!quit)
+		{
+			in = cin.nextLine();
+
+			try
+			{
+				parser.readLine(in);
+			}
+			catch(Exception e)
+			{
+				System.out.println(e.getMessage());
+			}
+		}
+
+		/*Connection con = null;
 		java.sql.Statement stmt = null;
 
 		try
@@ -35,15 +55,18 @@ public class Main
 			System.exit(0);
 		}
 
-		/*PythonInterpreter interp = new PythonInterpreter();
+		PythonInterpreter interp = new PythonInterpreter();
 
 		interp.exec("import com.pokedyna.fele.Statement;\n");
 
-		Statement stmt = new Statement("poke_dyna << { name:\"Vinicius\", ign:\"fele\", fc:\"0576-8181-8396\", character:\"lillie\" };");
 
 		interp.set("statement", stmt);
 
 		interp.exec("print(statement.getTableName())");
+
+
+
+		Statement stmt = new Statement("poke_dyna << { name:\"Vinicius\", ign:\"fele\", fc:\"0576-8181-8396\", character:\"lillie\" };");
 
 		System.out.printf(
 			"Table name: %s\n" +
@@ -51,6 +74,7 @@ public class Main
 			"Arguments: %s\n" +
 			"Procedure: %s\n",
 			stmt.getTableName(), stmt.getAction(), stmt.getArguments(), stmt.getProcedure()
-		);*/
+		);
+		*/
 	}
 }
