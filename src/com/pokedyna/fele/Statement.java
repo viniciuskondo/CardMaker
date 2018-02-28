@@ -70,7 +70,7 @@ public class Statement
 		}
 		else
 		{
-			procedure = new String();
+			procedure = "";
 		}
 	}
 

@@ -73,7 +73,7 @@ public class Parser
 					StringBuilder proc = new StringBuilder();
 					for(String line = bufferedReader.readLine(); line != null; line = bufferedReader.readLine())
 					{
-						proc.append(line + "\n");
+						proc.append(line).append("\n");
 					}
 
 					System.out.println(proc);
@@ -87,7 +87,7 @@ public class Parser
 		}
 		else if(action.equals(Statement.actions[Statement.enumActions.INSERT.ordinal()]))
 		{
-			sql = this.insert(statement);
+			sql = insert(statement);
 		}
 		else
 		{
@@ -182,7 +182,7 @@ public class Parser
 		return sql.toString();
 	}
 
-	private static String ExecuteSql(Connection con, String sql)
+	private static void ExecuteSql(Connection con, String sql)
 	{
 		java.sql.Statement stmt;
 		try
@@ -194,13 +194,11 @@ public class Parser
 		}
 		catch (Exception e)
 		{
-			return e.getClass().getName() + ": " + e.getMessage();
+			System.err.println(e.getClass().getName() + " " + e.getMessage());
 		}
-
-		return null;
 	}
 
-	private static String ExecuteSql(Connection con, String sql, String procedure)
+	private static void ExecuteSql(Connection con, String sql, String procedure)
 	{
 		java.sql.Statement stmt;
 
@@ -221,9 +219,7 @@ public class Parser
 		catch (Exception e)
 		{
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
-			return e.getClass().getName() + ": " + e.getMessage();
 		}
 
-		return null;
 	}
 }
