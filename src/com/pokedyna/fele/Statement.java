@@ -8,7 +8,7 @@ public class Statement
 	private String action;
 	private ArrayList<String> arguments;
 	private String procedure;
-	public static final String[] actions = { "=>", "<<", ">>" };
+	static final String[] actions = { "=>", "<<", ">>" };
 
 	public enum enumActions
 	{
@@ -51,7 +51,10 @@ public class Statement
 			}
 			else if(!readingLiteral && ch == '}')
 			{
-				arguments.add(argument.toString());
+				if(argument.length() > 1)
+				{
+					arguments.add(argument.toString());
+				}
 				break;
 			}
 			else if(!readingLiteral && !Character.isWhitespace(ch))
@@ -71,7 +74,7 @@ public class Statement
 		}
 	}
 
-	public String getTableName()
+	String getTableName()
 	{
 		return tableName;
 	}
@@ -80,7 +83,7 @@ public class Statement
 		this.tableName = tableName;
 	}
 
-	public String getAction()
+	String getAction()
 	{
 		return action;
 	}
@@ -89,7 +92,7 @@ public class Statement
 		this.action = action;
 	}
 
-	public ArrayList<String> getArguments()
+	ArrayList<String> getArguments()
 	{
 		return arguments;
 	}
@@ -98,7 +101,7 @@ public class Statement
 		this.arguments = arguments;
 	}
 
-	public String getProcedure()
+	String getProcedure()
 	{
 		return procedure;
 	}
