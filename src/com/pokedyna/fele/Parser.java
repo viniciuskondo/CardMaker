@@ -1,10 +1,42 @@
 package com.pokedyna.fele;
 
+import org.python.util.PythonInterpreter;
+
+import java.io.*;
+import java.sql.*;
+
 public class Parser
 {
-	public Parser()
+	private StringBuilder queryBuffer;
+	private Connection con;
+
+
+	public Parser(String databaseName)
 	{
+		try
+		{
+			Class.forName("org.sqlite.JDBC");
+			con = DriverManager.getConnection("jdbc:sqlite:test.db");
+		}
+		catch(Exception e)
+		{
+			con = null;
+			System.err.println(e.getMessage());
+		}
+
 		queryBuffer = new StringBuilder();
+	}
+
+	public void close()
+	{
+		try
+		{
+			con.close();
+		}
+		catch (SQLException e)
+		{
+			System.err.println(e.getLocalizedMessage());
+		}
 	}
 
 	public void readLine(String line)
@@ -23,23 +55,58 @@ public class Parser
 
 		String action = statement.getAction();
 
+		String sql;
+
 		if(action.equals(Statement.actions[Statement.enumActions.CREATE.ordinal()]))
 		{
-			this.create(statement);
+			sql = this.create(statement);
 		}
 		else if(action.equals(Statement.actions[Statement.enumActions.SELECT.ordinal()]))
 		{
-			this.select(statement);
+			sql = this.select(statement);
+			if(statement.getProcedure().isEmpty())
+			{
+				try
+				{
+					FileReader file = new FileReader("defaultprint.py");
+					BufferedReader bufferedReader = new BufferedReader(file);
+					StringBuilder proc = new StringBuilder();
+					for(String line = bufferedReader.readLine(); line != null; line = bufferedReader.readLine())
+					{
+						proc.append(line + "\n");
+					}
+
+					System.out.println(proc);
+					statement.setProcedure(proc.toString());
+				}
+				catch (Exception e)
+				{
+					System.err.println(e.getMessage());
+				}
+			}
 		}
 		else if(action.equals(Statement.actions[Statement.enumActions.INSERT.ordinal()]))
 		{
-			this.insert(statement);
+			sql = this.insert(statement);
+		}
+		else
+		{
+			throw new IllegalArgumentException("Action not suppoerted: " + statement.getAction());
+		}
+
+		if(statement.getProcedure().isEmpty())
+		{
+			ExecuteSql(con, sql);
+		}
+		else
+		{
+			ExecuteSql(con, sql, statement.getProcedure());
 		}
 
 		queryBuffer.setLength(0);
 	}
 
-	private void create(Statement statement)
+	private static String create(Statement statement)
 	{
 		StringBuilder sql = new StringBuilder("CREATE TABLE " + statement.getTableName() +
 				"( id INTEGER PRIMARY KEY AUTOINCREMENT"
@@ -52,10 +119,10 @@ public class Parser
 
 		sql.append(");");
 
-		System.out.println(sql);
+		return sql.toString();
 	}
 
-	private void select(Statement statement)
+	private static String select(Statement statement)
 	{
 		StringBuilder sql = new StringBuilder("SELECT * FROM " + statement.getTableName());
 
@@ -68,10 +135,10 @@ public class Parser
 			sql.append("WHERE " + statement.getArguments().get(0) + ';');
 		}
 
-		System.out.println(sql);
+		return sql.toString();
 	}
 
-	private void insert(Statement statement)
+	private static String insert(Statement statement)
 	{
 		StringBuilder sql = new StringBuilder("INSERT INTO " + statement.getTableName() + "(");
 
@@ -112,8 +179,51 @@ public class Parser
 
 		sql.append(");");
 
-		System.out.println(sql);
+		return sql.toString();
 	}
 
-	private StringBuilder queryBuffer;
+	private static String ExecuteSql(Connection con, String sql)
+	{
+		java.sql.Statement stmt;
+		try
+		{
+			stmt = con.createStatement();
+
+			stmt.executeUpdate(sql);
+			stmt.close();
+		}
+		catch (Exception e)
+		{
+			return e.getClass().getName() + ": " + e.getMessage();
+		}
+
+		return null;
+	}
+
+	private static String ExecuteSql(Connection con, String sql, String procedure)
+	{
+		java.sql.Statement stmt;
+
+		try
+		{
+			stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			PythonInterpreter interp = new PythonInterpreter();
+
+			interp.set("entry", rs);
+			interp.exec(procedure);
+			interp.cleanup();
+
+			rs.close();
+			stmt.close();
+		}
+		catch (Exception e)
+		{
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			return e.getClass().getName() + ": " + e.getMessage();
+		}
+
+		return null;
+	}
 }

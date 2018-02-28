@@ -1,9 +1,5 @@
 package com.pokedyna.fele;
 
-import org.python.compiler.Module;
-import org.python.util.PythonInterpreter;
-import org.python.core.*;
-import java.sql.*;
 import java.util.Scanner;
 
 
@@ -13,11 +9,18 @@ public class Main
 	{
 		Scanner cin = new Scanner(System.in);
 		String in;
-		Parser parser = new Parser();
-		boolean quit = false;
+		System.out.println("Insert database name");
+		in = cin.nextLine();
+		Parser parser = new Parser(in);
+		boolean quit = false; // Fix
 		while(!quit)
 		{
 			in = cin.nextLine();
+
+			if(in.equals("/quit"))
+			{
+				quit = true;
+			}
 
 			try
 			{
@@ -28,6 +31,8 @@ public class Main
 				System.out.println(e.getMessage());
 			}
 		}
+
+		parser.close();
 
 		/*Connection con = null;
 		java.sql.Statement stmt = null;
