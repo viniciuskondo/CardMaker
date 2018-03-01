@@ -9,7 +9,7 @@ public class Parser
 {
 	private StringBuilder queryBuffer;
 	private Connection con;
-
+	private PythonInterpreter interp = new PythonInterpreter();
 
 	public Parser(String databaseName)
 	{
@@ -24,6 +24,7 @@ public class Parser
 			System.err.println(e.getMessage());
 		}
 
+		interp = new PythonInterpreter();
 		queryBuffer = new StringBuilder();
 	}
 
@@ -60,47 +61,21 @@ public class Parser
 		if(action.equals(Statement.actions[Statement.enumActions.CREATE.ordinal()]))
 		{
 			sql = this.create(statement);
+			ExecuteSql(sql);
 		}
 		else if(action.equals(Statement.actions[Statement.enumActions.SELECT.ordinal()]))
 		{
 			sql = this.select(statement);
-			if(statement.getProcedure().isEmpty())
-			{
-				try
-				{
-					FileReader file = new FileReader("defaultprint.py");
-					BufferedReader bufferedReader = new BufferedReader(file);
-					StringBuilder proc = new StringBuilder();
-					for(String line = bufferedReader.readLine(); line != null; line = bufferedReader.readLine())
-					{
-						proc.append(line).append("\n");
-					}
-
-					System.out.println(proc);
-					statement.setProcedure(proc.toString());
-				}
-				catch (Exception e)
-				{
-					System.err.println(e.getMessage());
-				}
-			}
+			ExecuteSql(sql, statement.getProcedure());
 		}
 		else if(action.equals(Statement.actions[Statement.enumActions.INSERT.ordinal()]))
 		{
 			sql = insert(statement);
+			ExecuteSql(sql);
 		}
 		else
 		{
 			throw new IllegalArgumentException("Action not suppoerted: " + statement.getAction());
-		}
-
-		if(statement.getProcedure().isEmpty())
-		{
-			ExecuteSql(con, sql);
-		}
-		else
-		{
-			ExecuteSql(con, sql, statement.getProcedure());
 		}
 
 		queryBuffer.setLength(0);
@@ -132,7 +107,7 @@ public class Parser
 		}
 		else
 		{
-			sql.append("WHERE " + statement.getArguments().get(0) + ';');
+			sql.append("WHERE ").append(statement.getArguments().get(0)).append(';');
 		}
 
 		return sql.toString();
@@ -182,7 +157,7 @@ public class Parser
 		return sql.toString();
 	}
 
-	private static void ExecuteSql(Connection con, String sql)
+	private void ExecuteSql(String sql)
 	{
 		java.sql.Statement stmt;
 		try
@@ -198,7 +173,7 @@ public class Parser
 		}
 	}
 
-	private static void ExecuteSql(Connection con, String sql, String procedure)
+	private void ExecuteSql(String sql, String procedure)
 	{
 		java.sql.Statement stmt;
 
@@ -207,18 +182,29 @@ public class Parser
 			stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 
-			PythonInterpreter interp = new PythonInterpreter();
+			while(!rs.isAfterLast())
+			{
+				interp.set("entry", rs);
 
-			interp.set("entry", rs);
-			interp.exec(procedure);
-			interp.cleanup();
+				if (procedure.isEmpty())
+				{
+					interp.execfile("defaultprint.py");
+				}
+				else
+				{
+					interp.exec(procedure);
+				}
+
+				interp.cleanup();
+				rs.next();
+			}
 
 			rs.close();
 			stmt.close();
 		}
 		catch (Exception e)
 		{
-			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			System.err.println(e.getClass().getName() + ": " + e.getMessage() + " " + e.getCause());
 		}
 
 	}
