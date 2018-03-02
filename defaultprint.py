@@ -1,6 +1,8 @@
 metadata = entry.getMetaData()
 nColumns = metadata.getColumnCount()
 i = 1
+output = ""
 while i <= nColumns:
-    print(metadata.getColumnName(i) + ': ' + entry.getObject(i))
+    output += metadata.getColumnName(i) + ': ' + entry.getString(i) + ' '
     i += 1
+print(output)

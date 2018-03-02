@@ -16,7 +16,7 @@ public class Parser
 		try
 		{
 			Class.forName("org.sqlite.JDBC");
-			con = DriverManager.getConnection("jdbc:sqlite:test.db");
+			con = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
 		}
 		catch(Exception e)
 		{
@@ -60,12 +60,12 @@ public class Parser
 
 		if(action.equals(Statement.actions[Statement.enumActions.CREATE.ordinal()]))
 		{
-			sql = this.create(statement);
+			sql = create(statement);
 			ExecuteSql(sql);
 		}
 		else if(action.equals(Statement.actions[Statement.enumActions.SELECT.ordinal()]))
 		{
-			sql = this.select(statement);
+			sql = select(statement);
 			ExecuteSql(sql, statement.getProcedure());
 		}
 		else if(action.equals(Statement.actions[Statement.enumActions.INSERT.ordinal()]))
@@ -182,7 +182,7 @@ public class Parser
 			stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 
-			while(!rs.isAfterLast())
+			while(rs.next())
 			{
 				interp.set("entry", rs);
 
@@ -196,7 +196,6 @@ public class Parser
 				}
 
 				interp.cleanup();
-				rs.next();
 			}
 
 			rs.close();

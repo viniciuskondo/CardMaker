@@ -2,7 +2,7 @@
   <library name="jython">
     <CLASSES>
       <root url="jar://C:/lib/jython25/jython.jar!/" />
-      <root url="jar://$PROJECT_DIR$/../../../86DC8F5CDC8F4581/lib/jython25/jython.jar!/" />
+      <root url="jar://$USER_HOME$/Lib/jython-standalone-2.5.4-rc1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

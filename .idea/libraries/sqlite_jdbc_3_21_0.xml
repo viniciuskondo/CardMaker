@@ -3,6 +3,7 @@
     <CLASSES>
       <root url="jar://C:/lib/sqlite/sqlite-jdbc-3.21.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/../../../86DC8F5CDC8F4581/lib/sqlite/sqlite-jdbc-3.21.0.jar!/" />
+      <root url="jar://$USER_HOME$/Lib/sqlite-jdbc-3.21.0.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
