@@ -9,7 +9,7 @@ public class Parser
 {
 	private StringBuilder queryBuffer;
 	private Connection con;
-	private PythonInterpreter interp = new PythonInterpreter();
+	private PythonInterpreter interp;
 
 	public Parser(String databaseName)
 	{
@@ -42,9 +42,10 @@ public class Parser
 
 	public void readLine(String line)
 	{
-		queryBuffer.append(line);
+		queryBuffer.append(line).append('\n');
 
-		if(queryBuffer.toString().endsWith("};"))
+		// TODO: Check for other combinations of \n in "};"
+		if(queryBuffer.toString().endsWith("};\n"))
 		{
 			this.execute();
 		}
@@ -88,9 +89,7 @@ public class Parser
 		);
 
 		for(String argument : statement.getArguments())
-		{
-			sql.append( ", " + argument.replaceFirst(":", " ")	);
-		}
+			sql.append(", ").append(argument.replaceFirst(":", " "));
 
 		sql.append(");");
 

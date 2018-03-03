@@ -64,9 +64,10 @@ public class Statement
 		}
 
 		int endStatement = query.lastIndexOf('}');
+		int srtStatement = query.lastIndexOf('{');
 		if(endStatement > 0 && i != endStatement)
 		{
-			procedure = query.substring(i + 2, endStatement);
+			procedure = query.substring(srtStatement + 1, endStatement).trim();
 		}
 		else
 		{
