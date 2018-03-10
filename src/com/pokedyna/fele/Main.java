@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Main
 {
-    public static void main(String[] args)
+	public static void start()
 	{
 		Scanner cin = new Scanner(System.in);
 		String in;
@@ -21,6 +21,12 @@ public class Main
 			{
 				quit = true;
 			}
+			else if(in.matches("/file(.+)"))
+			{
+				String filename = in.substring(in.indexOf('(') + 1, in.indexOf(')'));
+
+				parser.readFile(filename);
+			}
 
 			try
 			{
@@ -33,5 +39,10 @@ public class Main
 		}
 
 		parser.close();
+	}
+
+    public static void main(String[] args)
+	{
+
 	}
 }

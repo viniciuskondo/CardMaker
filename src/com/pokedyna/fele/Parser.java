@@ -2,8 +2,11 @@ package com.pokedyna.fele;
 
 import org.python.util.PythonInterpreter;
 
-import java.io.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.*;
+import java.util.List;
 
 public class Parser
 {
@@ -37,6 +40,23 @@ public class Parser
 		catch (SQLException e)
 		{
 			System.err.println(e.getLocalizedMessage());
+		}
+	}
+
+	public void readFile(String filename)
+	{
+		try
+		{
+			List<String> lines = Files.readAllLines(Paths.get(filename));
+
+			for(String line : lines)
+			{
+				readLine(line);
+			}
+		}
+		catch(IOException e)
+		{
+			System.err.println(e.getClass() + " " + e.getMessage());
 		}
 	}
 
@@ -180,10 +200,12 @@ public class Parser
 		{
 			stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
+			Renderer r = new Renderer();
 
 			while(rs.next())
 			{
 				interp.set("entry", rs);
+				interp.set("render", r);
 
 				if (procedure.isEmpty())
 				{
