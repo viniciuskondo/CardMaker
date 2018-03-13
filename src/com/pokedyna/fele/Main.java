@@ -2,7 +2,6 @@ package com.pokedyna.fele;
 
 import java.util.Scanner;
 
-
 public class Main
 {
 	public static void start()
@@ -13,6 +12,7 @@ public class Main
 		in = cin.nextLine();
 		Parser parser = new Parser(in);
 		boolean quit = false; // Fix
+		System.out.println("Welcome to CardMaker - 0.1b\n");
 		while(!quit)
 		{
 			in = cin.nextLine();
@@ -43,6 +43,6 @@ public class Main
 
     public static void main(String[] args)
 	{
-
+        start();
 	}
 }

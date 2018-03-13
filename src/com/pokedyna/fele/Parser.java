@@ -76,9 +76,9 @@ public class Parser
 		Statement statement = new Statement(queryBuffer.toString());
 
 		String action = statement.getAction();
-
 		String sql;
 
+		long start = System.currentTimeMillis();
 		if(action.equals(Statement.actions[Statement.enumActions.CREATE.ordinal()]))
 		{
 			sql = create(statement);
@@ -98,7 +98,9 @@ public class Parser
 		{
 			throw new IllegalArgumentException("Action not suppoerted: " + statement.getAction());
 		}
+		long end = System.currentTimeMillis();
 
+		System.out.println("Statement successfully executed. Time elapsed: " + ((end - start) / 1000) + " seconds.");
 		queryBuffer.setLength(0);
 	}
 
